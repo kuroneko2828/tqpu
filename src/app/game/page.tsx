@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react';
 import { getWords, WordEntry } from '@components/SetUp';
 import { useRouter } from 'next/navigation';
 import { KanaRomanMap, convertYomiToRoman } from '@components/RegisterAlphabet';
-import Cookies from 'js-cookie';
 
 export default function Game() {
     const TIME_LIMIT = 60;
     const router = useRouter();
     const words: WordEntry[] = getWords();
-    const [userWords, setUserWords] = useState<WordEntry[]>([]);
     const [romanMap, setRomanMap] = useState<KanaRomanMap[]>([]);
     const [currentWord, setCurrentWord] = useState<WordEntry | null>(null);
     const [currentRoman, setCurrentRoman] = useState<string>('');
@@ -80,10 +78,10 @@ export default function Game() {
     };
 
     // Function to select a random word from the list
-    const selectRandomWord = (roman_map) => {
+    const selectRandomWord = (roman_map: KanaRomanMap[]) => {
         const randomIndex = Math.floor(Math.random() * words.length);
         let newWord = words[randomIndex];
-        let newRoman = convertYomiToRoman(newWord.yomi, roman_map);
+        const newRoman = convertYomiToRoman(newWord.yomi, roman_map);
         while (newWord === currentWord) {
             newWord = words[Math.floor(Math.random() * words.length)];
         }
@@ -111,7 +109,7 @@ export default function Game() {
             {!isGameActive && !gameResult ? (
                 <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md text-center">
                     <h2 className="text-2xl font-bold mb-4">Typing Game</h2>
-                    <p className="mb-4">Get ready to type! You'll have 60 seconds.</p>
+                    <p className="mb-4">制限時間60秒</p>
                     <button 
                         onClick={startGame}
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"

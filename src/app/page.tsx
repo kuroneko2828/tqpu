@@ -2,27 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getWords, WordEntry } from '@components/SetUp';
 import { KanaRomanMap } from '@components/RegisterAlphabet';
-import { convertWordsToRoman } from '@components/RegisterAlphabet';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 
 export default function Home() {
   const router = useRouter();
-  const words: WordEntry[] = getWords();
-  const [romanMap, setRomanMap] = useState<WordEntry[]>([]);
-  const [fileContent, setFileContent] = useState('');
-  const [isProcessing, setIsProcessing] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
 
   useEffect(() => {
     // Check if userWords exist in cookies on component mount
     const savedRomanMap = localStorage.getItem('romanMap');
     if (savedRomanMap) {
-      setRomanMap(JSON.parse(savedRomanMap));
       setCanProceed(true);
-      setIsProcessing(false);
     }
   }, []);
 
@@ -37,17 +28,22 @@ export default function Home() {
     }
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // const file = event.target.files[0];
+    const files = event.target.files;
+    if (!files) return;
+    const file = files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
+        if (!e.target || !e.target.result) return;
         const content = e.target.result;
-        setFileContent(content);
+        // content to string
+        const content_str = content.toString();
         const roman_data: KanaRomanMap[] = [];
-        const lines = content.split('\n');
+        const lines = content_str.split('\n');
         
-        for (let line of lines) {
+        for (const line of lines) {
           const row_split = line.split('\t');
           if (row_split.length >= 2) {
             roman_data.push({
@@ -56,9 +52,7 @@ export default function Home() {
             });
           }
         }
-        setRomanMap(roman_data);
         saveRomanMapToLocalStorage(roman_data);
-        setIsProcessing(false);
       };
       reader.readAsText(file);
     }

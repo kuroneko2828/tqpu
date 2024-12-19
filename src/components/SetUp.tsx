@@ -1,6 +1,4 @@
-import path from 'path';
-import { parse } from 'csv-parse/sync';
-import csvContent from '@data/words.csv';
+import csvContent from '@/data/words.csv';
 
 export interface WordEntry {
     word: string;

@@ -1,5 +1,3 @@
-import { WordEntry } from '@components/SetUp';
-
 export interface KanaRomanMap {
   kana: string;
   roman: string;
