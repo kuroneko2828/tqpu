@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { getWords, WordEntry } from '@components/SetUp';
 import { useRouter } from 'next/navigation';
 import { KanaRomanMap, convertYomiToRoman } from '@components/RegisterAlphabet';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Timer, Award, KeyboardIcon, RotateCcw } from 'lucide-react';
 
 export default function Game() {
     const TIME_LIMIT = 60;
@@ -14,12 +17,14 @@ export default function Game() {
     const [currentRoman, setCurrentRoman] = useState<string>('');
     const [gameResult, setGameResult] = useState<{
         wordCount: number, 
-        totalCharacters: number
+        totalCharacters: number,
+        accuracy: number
     } | null>(null);
     const [timeRemaining, setTimeRemaining] = useState(60);
     const [isGameActive, setIsGameActive] = useState(false);
     const [wordCount, setWordCount] = useState(0);
     const [totalCharacters, setTotalCharacters] = useState(0);
+    const [totalMistakes, setTotalMistakes] = useState(0);
 
     useEffect(() => {
         const savedRomanMap = localStorage.getItem('romanMap');
@@ -34,7 +39,6 @@ export default function Game() {
         }
     }, []);
 
-    // Timer effect
     useEffect(() => {
         let timerId: NodeJS.Timeout;
         
@@ -51,33 +55,36 @@ export default function Game() {
         };
     }, [isGameActive, timeRemaining]);
 
-    // Function to start the game
     const startGame = () => {
         setWordCount(0);
         setTotalCharacters(0);
+        setTotalMistakes(0);
         setIsGameActive(true);
         setGameResult(null);
         setTimeRemaining(TIME_LIMIT);
         selectRandomWord(romanMap);
     };
 
-    // Function to end the game
     const endGame = () => {
         setIsGameActive(false);
-        // You can modify this to track total characters and words completed
+        const accuracy = totalCharacters > 0 
+            ? ((totalCharacters - totalMistakes) / totalCharacters * 100).toFixed(1)
+            : 0;
         setGameResult({
-            wordCount: wordCount, // This will need to be tracked during gameplay
-            totalCharacters: totalCharacters // This will need to be tracked during gameplay
+            wordCount,
+            totalCharacters,
+            accuracy: Number(accuracy)
         });
     };
 
-    // Function to handle game restart
     const handleRestart = () => {
         startGame();
-        // router.replace('/game');
     };
 
-    // Function to select a random word from the list
+    const handleHome = () => {
+        router.push('/');
+    };
+
     const selectRandomWord = (roman_map: KanaRomanMap[]) => {
         const randomIndex = Math.floor(Math.random() * words.length);
         let newWord = words[randomIndex];
@@ -85,12 +92,10 @@ export default function Game() {
         while (newWord === currentWord) {
             newWord = words[Math.floor(Math.random() * words.length)];
         }
-        console.log(newWord);
         setCurrentWord(newWord);
         setCurrentRoman(newRoman);
     };
 
-    // Function to handle moving to next word after successful typing
     const handleWordComplete = () => {
         if (isGameActive) {
             setWordCount(wordCount + 1);
@@ -99,53 +104,98 @@ export default function Game() {
         }
     };
 
-    // If no words are loaded, show loading
+    const handleMistake = () => {
+        setTotalMistakes(prev => prev + 1);
+    };
+
     if (!currentWord) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 max-w-3xl">
             {!isGameActive && !gameResult ? (
-                <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md text-center">
-                    <h2 className="text-2xl font-bold mb-4">Typing Game</h2>
-                    <p className="mb-4">制限時間60秒</p>
-                    <button 
+                <Card className="p-8 text-center">
+                    <h1 className="text-3xl font-bold mb-6">タイピングゲーム</h1>
+                    <div className="space-y-4 mb-8">
+                        <div className="flex items-center justify-center space-x-2">
+                            <Timer className="w-5 h-5 text-gray-600" />
+                            <span className="text-lg">制限時間: 60秒</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-2">
+                            <KeyboardIcon className="w-5 h-5 text-gray-600" />
+                            <span className="text-lg">ローマ字入力で遊びます</span>
+                        </div>
+                    </div>
+                    <Button 
+                        size="lg"
                         onClick={startGame}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                        className="w-full max-w-xs bg-green-500 hover:bg-green-600"
                     >
-                        Start Game
-                    </button>
-                </div>
+                        ゲームを始める
+                    </Button>
+                </Card>
             ) : !gameResult ? (
-                <div>
-                    <div className="mb-4 text-center">
-                        <span className="text-xl font-bold">Time Remaining: {timeRemaining} seconds</span>
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
+                        <div className="flex items-center space-x-2">
+                            <Timer className="w-5 h-5 text-gray-600" />
+                            <span className="text-xl font-bold">
+                                {timeRemaining}秒
+                            </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xl font-bold">{wordCount}単語</span>
+                        </div>
                     </div>
                     <TypingGame 
                         targetText={currentRoman}
                         wordInfo={currentWord}
                         onComplete={handleWordComplete}
+                        onMistake={handleMistake}
                     />
                 </div>
             ) : (
-                <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md text-center">
-                    <h2 className="text-2xl font-bold mb-4">Game Over!</h2>
-                    <div className="mb-4">
-                        <p className="text-lg">Words Completed: 
-                            <span className="font-bold ml-2">{gameResult.wordCount}</span>
-                        </p>
-                        <p className="text-lg">Total Characters Typed: 
-                            <span className="font-bold ml-2">{gameResult.totalCharacters}</span>
-                        </p>
+                <Card className="p-8 text-center">
+                    <div className="flex justify-center mb-6">
+                        <Award className="w-16 h-16 text-yellow-400" />
                     </div>
-                    <button 
-                        onClick={handleRestart}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                    >
-                        Play Again
-                    </button>
-                </div>
+                    <h2 className="text-3xl font-bold mb-8">ゲーム終了！</h2>
+                    <div className="space-y-4 mb-8">
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-lg mb-2">タイプした単語数</p>
+                            <p className="text-3xl font-bold text-blue-600">{gameResult.wordCount}</p>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-lg mb-2">タイプした文字数</p>
+                            <p className="text-3xl font-bold text-green-600">{gameResult.totalCharacters}</p>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-lg mb-2">正確率</p>
+                            <p className="text-3xl font-bold text-purple-600">{gameResult.accuracy}%</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col space-y-3">
+                        <Button 
+                            onClick={handleRestart}
+                            className="w-full"
+                        >
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            もう一度プレイ
+                        </Button>
+                        <Button 
+                            onClick={handleHome}
+                            variant="outline"
+                            className="w-full"
+                        >
+                            ホームに戻る
+                        </Button>
+                    </div>
+                </Card>
             )}
         </div>
     );
