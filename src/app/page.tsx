@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { KanaRomanMap } from '@components/RegisterAlphabet';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Home() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function Home() {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     // const file = event.target.files[0];
+    console.log(event.target.files);
     const files = event.target.files;
     if (!files) return;
     const file = files[0];
@@ -61,26 +63,61 @@ export default function Home() {
   const handleNextPage = () => {
     router.push('/game');
   };
-
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-2xl">
+      {/* ロゴとタイトルセクション */}
+      <div className="flex flex-col items-center mb-8">
+        <div className="w-32 h-32 relative mb-4">
+          <Image
+            src="/tqpu_transparent-.png"
+            alt="サービスロゴ"
+            width={500}
+            height={500}
+          />
+        </div>
+        <h1 className="text-3xl font-bold text-center mb-2">
+        あなただけのタイピングを
+        </h1>
+        <p className="text-gray-600 text-center mb-8 px-4">
+          AZIKなどでローマ字変換をしている方向けのタイピング練習サイトです。<br />
+          ローマ字テーブルをアップロードして、練習を始めましょう。
+        </p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>ファイルアップロード</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="font-semibold mb-2">使い方</h3>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
+                <li>ローマ字テーブルをGoogle日本語入力の設定からエクスポートしてください</li>
+                <li>下の「ファイルを選択」ボタンからファイルをアップロードしてください</li>
+                <li>処理が完了したら「次へ」ボタンをクリックして練習を開始しましょう</li>
+              </ol>
+            </div>
+            
             <input 
               type="file" 
               accept=".txt"
               onChange={handleFileUpload}
-              className="mb-4"
+              className="mb-4 block w-full text-sm text-gray-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-lg file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100"
             />
             
-            {(canProceed) && (
+            {canProceed && (
               <div className="flex flex-col items-center space-y-4">
                 <p className="text-green-600 font-bold">処理完了</p>
-                <Button onClick={handleNextPage}>
+                <Button 
+                  onClick={handleNextPage}
+                  className="w-full max-w-xs"
+                >
                   次へ
                 </Button>
               </div>
