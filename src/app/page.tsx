@@ -78,7 +78,7 @@ export default function Home() {
           />
         </div>
         <h1 className="text-3xl font-bold text-center mb-2">
-        あなただけのタイピングを
+        あなただけのタイピング体験を
         </h1>
         <p className="text-gray-600 text-center mb-8 px-4">
           AZIKなどでローマ字変換をしている方向けのタイピング練習サイトです。<br />
