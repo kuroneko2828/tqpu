@@ -88,14 +88,14 @@ export default function Home() {
 
       <Card>
         <CardHeader>
-          <CardTitle>ファイルアップロード</CardTitle>
+          <CardTitle>ローマ字テーブルのアップロード</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4">
             <div className="bg-gray-50 p-4 rounded-lg mb-4">
               <h3 className="font-semibold mb-2">使い方</h3>
               <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
-                <li>ローマ字テーブルをGoogle日本語入力の設定からエクスポートしてください</li>
+                <li>Google日本語入力の設定からローマ字テーブルをエクスポートしてください</li>
                 <li>下の「ファイルを選択」ボタンからファイルをアップロードしてください</li>
                 <li>処理が完了したら「次へ」ボタンをクリックして練習を開始しましょう</li>
               </ol>
