@@ -73,8 +73,8 @@ export default function Home() {
           <Image
             src={`${BASE_PATH}/tqpu_transparent-.png`}
             alt="サービスロゴ"
-            width={500}
-            height={500}
+            width={700}
+            height={700}
           />
         </div>
         <h1 className="text-3xl font-bold text-center mb-2">
