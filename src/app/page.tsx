@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { KanaRomanMap } from '@components/RegisterAlphabet';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import nextConfig from "../../next.config.js";
+const BASE_PATH = nextConfig.basePath || "";
 
 export default function Home() {
   const router = useRouter();
@@ -69,7 +71,7 @@ export default function Home() {
       <div className="flex flex-col items-center mb-8">
         <div className="w-32 h-32 relative mb-4">
           <Image
-            src="/tqpu_transparent-.png"
+            src={`${BASE_PATH}/tqpu_transparent-.png`}
             alt="サービスロゴ"
             width={500}
             height={500}
